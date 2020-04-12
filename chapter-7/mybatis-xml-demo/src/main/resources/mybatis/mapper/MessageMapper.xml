@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.mybatis.xml.mapper.MessageMapper">
+<!--    <resultMap id="BaseResultMap" type="com.spring.mybatis.xml.model.Message" >-->
+<!--        &lt;!&ndash;配置主键映射关系，配置主键可以增加查询效率&ndash;&gt;-->
+<!--        <id column="msg_id" property="msgId" jdbcType="BIGINT" />-->
+<!--        &lt;!&ndash;配置普通字段的映射关系&ndash;&gt;-->
+<!--        <result column="msg_text" property="msgText" jdbcType="VARCHAR" />-->
+<!--        <result column="msg_summary" property="msgSummary" jdbcType="VARCHAR" />-->
+<!--    </resultMap>-->
+    <sql id="Base_Column_List" >
+        msg_id, msg_text, msg_summary
+    </sql>
+    <select id="selectAll" resultType="com.spring.mybatis.xml.model.Message">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM message
+    </select>
+    <select id="selectById" parameterType="Integer" resultType="com.spring.mybatis.xml.model.Message">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM message
+        WHERE msg_id=#{msgId}
+    </select>
+    <insert id="insert" parameterType="com.spring.mybatis.xml.model.Message" >
+        INSERT INTO message (msg_text, msg_summary) VALUES (#{msgText}, #{msgSummary})
+    </insert>
+    <insert id="batchInsert" parameterType="com.spring.mybatis.xml.model.Message" >
+        INSERT INTO message (msg_text, msg_summary) VALUES
+        <foreach collection ="list" item="msg" index= "index" separator =",">
+            (#{msg.msgText}, #{msg.msgSummary})
+        </foreach>
+    </insert>
+    <update id="update" parameterType="com.spring.mybatis.xml.model.Message" >
+        UPDATE message SET
+        <if test="msgText != null"> msg_text=#{msgText},</if>
+        <if test="msgSummary != null"> msg_summary=#{msgSummary} </if>
+        WHERE msg_id = #{msgId}
+    </update>
+    <update id="updateText" parameterType="com.spring.mybatis.xml.model.Message" >
+        UPDATE message
+        <set>
+            <if test="msgText != null and msgText != ''"> msg_text=#{msgText} </if>
+            <if test="msgSummary != null and msgSummary != ''"> msg_summary=#{msgSummary} </if>
+        </set>
+        WHERE msg_id = #{msgId}
+    </update>
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM message WHERE msg_id=#{msgId}
+    </delete>
+
+    <select id="selectByCondition" resultType="com.spring.mybatis.xml.model.Message">
+        select * from message where 1=1
+        <choose>
+            <when test="msgText != null and msgText !=''">
+                and msg_text like concat('%', #{msgText}, '%')
+            </when>
+            <when test="msgSummary !=null and msgSummary !=''">
+                and msg_summary = #{msgSummary}
+            </when>
+            <otherwise>
+                and msg_id is not null
+            </otherwise>
+        </choose>
+    </select>
+
+<!--    <select id="selectByCondition" resultType="com.spring.mybatis.xml.model.Message">-->
+<!--        select * from message-->
+<!--        <where>-->
+<!--            <if test="msgText != null and msgText !=''">-->
+<!--                and msg_text like concat('%', #{msgText}, '%')-->
+<!--            </if>-->
+<!--            <if test="msgSummary !=null and msgSummary !=''">-->
+<!--                and msg_summary = #{msgSummary}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+<!--    <select id="selectByCondition" resultType="com.spring.mybatis.xml.model.Message">-->
+<!--        select * from message-->
+<!--        <trim prefix="where" prefixOverrides="and">-->
+<!--            <if test="msgText != null and msgText !=''">-->
+<!--                and msg_text like concat('%', #{msgText}, '%')-->
+<!--            </if>-->
+<!--            <if test="msgSummary !=null and msgSummary !=''">-->
+<!--                and msg_summary = #{msgSummary}-->
+<!--            </if>-->
+<!--        </trim>-->
+<!--    </select>-->
+</mapper>
